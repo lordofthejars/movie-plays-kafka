@@ -18,15 +18,21 @@ public class InteractiveQueries {
     @Inject
     KafkaStreams streams;
 
+    
     public Optional<MoviePlayCountData> getMoviePlayCountData(int id) {
+        // gets the state store and get the movie count by movie id
         MoviePlayCount moviePlayCount = getMoviesPlayCount().get(id);
+        // If there is a result
         if (moviePlayCount != null) {
+            // Wrap the result into MoviePlayCountData
             return Optional.of(new MoviePlayCountData(moviePlayCount.name, moviePlayCount.count));
         } else {
             return Optional.empty();
         }
     }
 
+
+    // Gets the state store 
     private ReadOnlyKeyValueStore<Integer, MoviePlayCount> getMoviesPlayCount() {
         while (true) {
             try {

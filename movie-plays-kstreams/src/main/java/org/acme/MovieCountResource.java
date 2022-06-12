@@ -12,6 +12,7 @@ import javax.ws.rs.core.Response.Status;
 @Path("/movie")
 public class MovieCountResource {
 
+    // Injects the previous class to make queries
     @Inject
     InteractiveQueries interactiveQueries;
 
@@ -20,6 +21,7 @@ public class MovieCountResource {
     public Response movieCountData(@PathParam("id") int id) {
         Optional<MoviePlayCountData> moviePlayCountData = interactiveQueries.getMoviePlayCountData(id);
 
+        // Depending on the result returns the value or a 404
         if (moviePlayCountData.isPresent()) {
             return Response.ok(moviePlayCountData.get()).build();
         } else {
