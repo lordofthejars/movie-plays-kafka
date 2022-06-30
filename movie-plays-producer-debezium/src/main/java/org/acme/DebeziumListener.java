@@ -1,17 +1,16 @@
 package org.acme;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import java.io.IOException;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
-import javax.inject.Inject;
 
-import org.apache.kafka.clients.KafkaClient;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.context.ManagedExecutor;
 
 import io.debezium.config.Configuration;
-import io.debezium.embedded.EmbeddedEngine;
+import io.debezium.engine.ChangeEvent;
+import io.debezium.engine.DebeziumEngine;
+import io.debezium.engine.format.Json;
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
 import io.smallrye.reactive.messaging.kafka.KafkaClientService;
@@ -20,10 +19,10 @@ import io.smallrye.reactive.messaging.kafka.KafkaClientService;
 public class DebeziumListener {
     
     ManagedExecutor executor;
-
     KafkaClientService kafkaClient;
-
     Configuration configuration;
+
+    private DebeziumEngine<ChangeEvent<String, String>> engine;
 
     public DebeziumListener(ManagedExecutor executor, KafkaClientService kafkaClient, Configuration configuration) {
         this.executor = executor;
@@ -31,17 +30,27 @@ public class DebeziumListener {
         this.configuration = configuration;
     }
 
-    EmbeddedEngine engine;
-
     void onStart(@Observes StartupEvent event) {
-        System.out.println(kafkaClient);
-        System.out.println(executor);
-        System.out.println(configuration);
+        System.out.println("Initializing Debezium");
+        System.out.println("*****************");
+        System.out.println(this.configuration);
+        System.out.println("*****************");
+        this.engine = DebeziumEngine.create(Json.class)
+            .using(this.configuration.asProperties())
+            .notifying(this::handleChangeEvent)
+            .build();
+
+        this.executor.execute(this.engine);
     }
 
-    void onStop(@Observes ShutdownEvent event) {
+    void handleChangeEvent(ChangeEvent<String, String> record) {
+        System.out.println("New Record");
+        System.out.println(record);
+    }
+
+    void onStop(@Observes ShutdownEvent event) throws IOException {
         if (this.engine != null) {
-            this.engine.stop();
+            this.engine.close();
         }
     }
 
