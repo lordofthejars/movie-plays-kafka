@@ -8,29 +8,25 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.debezium.outbox.quarkus.ExportedEvent;
 
-public class GameEvent implements ExportedEvent<String, JsonNode> {
+public class MovieEvent implements ExportedEvent<String, JsonNode> {
 
     private static ObjectMapper mapper = new ObjectMapper();
 
-    private static final String TYPE = "Game";
-    private static final String EVENT_TYPE = "GameCreated";
+    // Set the type enclosed inside the event
+    private static final String TYPE = "Movie";
+    // Set the event type
+    private static final String EVENT_TYPE = "MovieCreated";
 
     private final long gameId;
     private final JsonNode jsonNode;
     private final Instant timestamp;
 
-    public GameEvent(Game game) {
-        this.gameId = game.id;
+    // Saves Game info in the class
+    public MovieEvent(Movie movie) {
+        this.gameId = movie.id;
         this.timestamp = Instant.now();
-        this.jsonNode = convertToJson(game);
-    }
-
-    private JsonNode convertToJson(Game game) {
-        ObjectNode asJson = mapper.createObjectNode()
-                .put("id", game.id)
-                .put("name", game.name);
-        
-        return asJson;
+        // Saves game content in a string column in JSON format
+        this.jsonNode = convertToJson(movie);
     }
 
     @Override
@@ -58,4 +54,14 @@ public class GameEvent implements ExportedEvent<String, JsonNode> {
         return EVENT_TYPE;
     }
     
+    private JsonNode convertToJson(Movie movie) {
+        ObjectNode asJson = mapper.createObjectNode()
+                .put("id", movie.id)
+                .put("name", movie.name)
+                .put("director", movie.director)
+                .put("genre", movie.genre);
+        
+        return asJson;
+    }
+
 }
