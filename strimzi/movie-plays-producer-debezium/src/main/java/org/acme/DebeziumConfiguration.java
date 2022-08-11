@@ -47,7 +47,7 @@ public class DebeziumConfiguration {
             .with("database.dbname", jdbcParser.getDatabase())
             .with("database.include.list", jdbcParser.getDatabase())
             // Debezium only sends events for the modifications of OutboxEvent table and not all tables
-            .with("table.include.list", jdbcParser.getDatabase() + ".OutboxEvent")
+            .with("table.include.list", jdbcParser.getDatabase().trim() + ".OutboxEvent")
             .with("include.schema.changes", "false")
             .with("database.server.id", "10181")
             .with("database.server.name", "movies-mysql-db-server")
