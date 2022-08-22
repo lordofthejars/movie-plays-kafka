@@ -11,12 +11,12 @@ spec:
     tasks.max: 1
     database.hostname: mysql
     database.port: 3306
-    database.user: root
-    database.password: alex
+    database.user: ${secrets:kafka/mysqlsecret:mysqluser}
+    database.password: ${secrets:kafka/mysqlsecret:mysqlpassword}
     database.server.id: 184054
     database.server.name: mysql
     database.include.list: moviesdb
     database.allowPublicKeyRetrieval: true
     table.include.list: moviesdb.OutboxEvent
-    database.history.kafka.bootstrap.servers: my-cluster-kafka-bootstrap:9092
+    database.history.kafka.bootstrap.servers: my-cluster-kafka-bootstrap:9093
     database.history.kafka.topic: schema-changes.movies

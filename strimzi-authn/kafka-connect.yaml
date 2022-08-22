@@ -1,0 +1,31 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnect
+metadata:
+  name: debezium-connect-cluster
+  annotations:
+    strimzi.io/use-connector-resources: "true"
+spec:
+  version: 3.2.0
+  image: quay.io/lordofthejars/debezium-connector-mysql:1.9.4
+  replicas: 1
+  bootstrapServers: my-cluster-kafka-bootstrap:9093
+  tls:
+    trustedCertificates:
+      - secretName: my-cluster-cluster-ca-cert
+        certificate: ca.crt
+  authentication:
+    type: tls
+    certificateAndKey:
+      secretName: my-connect
+      certificate: user.crt
+      key: user.key
+  config:
+    config.providers: secrets
+    config.providers.secrets.class: io.strimzi.kafka.KubernetesSecretConfigProvider
+    group.id: connect-cluster
+    offset.storage.topic: connect-cluster-offsets
+    offset.storage.replication.factor: 1
+    config.storage.topic: connect-cluster-configs
+    config.storage.replication.factor: 1
+    status.storage.topic: connect-cluster-status
+    status.storage.replication.factor: 1

@@ -1,0 +1,24 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: connector-configuration-role
+  namespace: kafka
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  resourceNames: ["mysqlsecret"]
+  verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: connector-configuration-role-binding
+  namespace: kafka
+subjects:
+- kind: ServiceAccount
+  name: my-connect-connect
+  namespace: kafka
+roleRef:
+  kind: Role
+  name: connector-configuration-role
+  apiGroup: rbac.authorization.k8s.io
